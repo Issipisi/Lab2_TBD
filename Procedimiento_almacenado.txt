@@ -1,0 +1,31 @@
+---FUNCION
+CREATE OR REPLACE FUNCTION reporte_usuarios_queries()
+RETURNS TABLE (usuario_id INT, query_type TEXT, query_count BIGINT, last_query TEXT) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        user_id AS usuario_id,
+        operation_type AS query_type,
+        COUNT(*) AS query_count,
+        MAX(query_text) AS last_query
+    FROM auditorio
+    WHERE operation_type IN ('INSERT', 'UPDATE', 'DELETE')
+    GROUP BY user_id, operation_type
+    ORDER BY query_count DESC;
+END;
+$$ LANGUAGE plpgsql;
+
+
+--TABLA DE PRUEBA
+-- Insertar datos de prueba en la tabla auditorio para probar el trigger
+INSERT INTO auditorio (user_id, operation_type, query_text, execution_time)
+VALUES
+    (1, 'INSERT', 'INSERT INTO usuarios (nombre, edad) VALUES (''Juan'', 30)', '2023-10-19 12:00:00'),
+    (2, 'UPDATE', 'UPDATE usuarios SET edad = 31 WHERE nombre = ''María''', '2023-10-19 12:15:00'),
+    (1, 'DELETE', 'DELETE FROM usuarios WHERE nombre = ''Juan''', '2023-10-19 12:30:00'),
+    (3, 'INSERT', 'INSERT INTO usuarios (nombre, edad) VALUES (''Carlos'', 25)', '2023-10-19 12:45:00'),
+    (2, 'UPDATE', 'UPDATE usuarios SET edad = 32 WHERE nombre = ''María''', '2023-10-19 13:00:00'),
+    (4, 'INSERT', 'INSERT INTO usuarios (nombre, edad) VALUES (''Laura'', 28)', '2023-10-19 13:15:00');
+
+--LLAMADA FUNCION
+SELECT * FROM reporte_usuarios_queries();

@@ -1,0 +1,17 @@
+SELECT * FROM public.voluntario
+SELECT * FROM public.audiotorio
+
+
+CREATE OR REPLACE FUNCTION log_query()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO audit_log (user_id, operation_type, query_text, execution_time)
+    VALUES (current_setting('jwt.claims.user_id')::INT, TG_OP, current_query(), NOW());
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER audit_trigger
+AFTER INSERT OR UPDATE OR DELETE ON auditorio
+FOR EACH STATEMENT
+EXECUTE FUNCTION log_query();
