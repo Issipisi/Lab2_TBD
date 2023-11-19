@@ -7,7 +7,6 @@ import org.sql2o.Connection;
 import org.sql2o.Sql2o;
 
 import java.util.List;
-//repositorio actualizado
 
 @Repository
 public class InstitucionRepository {
@@ -15,14 +14,14 @@ public class InstitucionRepository {
     private Sql2o sql2o;
 
     public List<Institucion> findAll() {
-        final String sql = "SELECT id, nombre, ST_AsText(ubicacion) as ubicacion FROM institucion";
+        final String sql = "SELECT id, nombre, ubicacion FROM institucion";
         try (Connection con = sql2o.open()) {
             return con.createQuery(sql).executeAndFetch(Institucion.class);
         }
     }
 
     public Institucion findById(Long id) {
-        final String sql = "SELECT id, nombre, ST_AsText(ubicacion) as ubicacion FROM institucion WHERE id = :id";
+        final String sql = "SELECT id, nombre, ubicacion FROM institucion WHERE id = :id";
         try (Connection con = sql2o.open()) {
             return con.createQuery(sql)
                     .addParameter("id", id)
@@ -31,7 +30,7 @@ public class InstitucionRepository {
     }
 
     public void save(Institucion institucion) {
-        final String sql = "INSERT INTO institucion (nombre, ubicacion) VALUES (:nombre, ST_GeomFromText(:ubicacion, 4326))";
+        final String sql = "INSERT INTO institucion (nombre, ubicacion) VALUES (:nombre, :ubicacion)";
         try (Connection con = sql2o.open()) {
             Long id = (Long) con.createQuery(sql, true)
                     .bind(institucion)
@@ -42,7 +41,7 @@ public class InstitucionRepository {
     }
 
     public void update(Institucion institucion) {
-        final String sql = "UPDATE institucion SET nombre = :nombre, ubicacion = ST_GeomFromText(:ubicacion, 4326) WHERE id = :id";
+        final String sql = "UPDATE institucion SET nombre = :nombre, ubicacion = :ubicacion WHERE id = :id";
         try (Connection con = sql2o.open()) {
             con.createQuery(sql)
                     .bind(institucion)
@@ -59,5 +58,3 @@ public class InstitucionRepository {
         }
     }
 }
-
-
