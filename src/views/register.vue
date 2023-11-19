@@ -65,12 +65,15 @@ export default {
       correo: '',
       contrasena: '',
       contrasena2: '',
-      ubicacion: '',
+      ubicacion: null,
     };
   },
   methods: {
     updateLocation(location) {
-      this.ubicacion = `POINT(${location.lng} ${location.lat})`;
+      this.ubicacion = {
+        type: 'Point',
+        coordinates: [location.lng, location.lat],
+      };
     },
     async enviarRegistro() {
       if (this.contrasena !== this.contrasena2) {
