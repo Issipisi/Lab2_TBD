@@ -33,10 +33,6 @@
                 <label for="password2" class="form-label">Repita su contraseña:</label>
                 <input v-model="contrasena2" id="password2" class="form-control" placeholder="password" type="password" />
               </div>
-              <div class="mb-2">
-                <label class="form-label">Seleccione su ubicación:</label>
-                <map-component @location-selected="updateLocation"></map-component>
-              </div>
             </div>
             <div class="col-md-2"></div>
             <div class="row mt-4">
@@ -52,12 +48,7 @@
 </template>
 
 <script>
-import MapComponent from './MapComponent.vue';
-
 export default {
-  components: {
-    MapComponent,
-  },
   data() {
     return {
       nombres: '',
@@ -65,16 +56,9 @@ export default {
       correo: '',
       contrasena: '',
       contrasena2: '',
-      ubicacion: null,
     };
   },
   methods: {
-    updateLocation(location) {
-      this.ubicacion = {
-        type: 'Point',
-        coordinates: [location.lng, location.lat],
-      };
-    },
     async enviarRegistro() {
       if (this.contrasena !== this.contrasena2) {
         alert("Las contraseñas no coinciden");
@@ -85,29 +69,31 @@ export default {
         apellido: this.apellidos,
         correo: this.correo,
         contrasena: this.contrasena,
-        ubicacion: this.ubicacion,
       };
       try {
-        console.log("Enviando Registro", requestData);
+        console.log("Enciando Registros", requestData);
         const response = await fetch('http://localhost:8080/voluntarios/signup', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json'
+          },
           body: JSON.stringify(requestData)
         });
-        if (response.ok) {
-          console.log('Registro enviado con éxito');
+        if (response.ok){
+          console.log('Registro Enviado con exito');
+
+          // Aquí rediriges al usuario después de un registro exitoso
           this.$router.push('/login');
         } else {
-          console.error('Error al registrar');
+          console.error('Error al registrar')
         }
-      } catch (error) {
+      }catch (error){
         console.error('Error registrando el usuario', error);
       }
     }
   }
 }
 </script>
-
 
 <style scoped>
 

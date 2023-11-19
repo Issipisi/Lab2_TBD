@@ -14,14 +14,14 @@ public class EmergenciaRepository {
     private Sql2o sql2o;
 
     public List<Emergencia> findAll() {
-        final String sql = "SELECT id, nombre, descripcion, ubicacion, institucion_id FROM emergencia";
+        final String sql = "SELECT id, nombre, descripcion, ST_AsText(ubicacion) as ubicacion, institucion_id FROM emergencia";
         try (Connection con = sql2o.open()) {
             return con.createQuery(sql).executeAndFetch(Emergencia.class);
         }
     }
 
     public Emergencia findById(Long emergenciaId) {
-        final String sql = "SELECT id, nombre, descripcion, ubicacion, institucion_id FROM emergencia WHERE id = :emergenciaId";
+        final String sql = "SELECT id, nombre, descripcion, ST_AsText(ubicacion) as ubicacion, institucion_id FROM emergencia WHERE id = :emergenciaId";
         try (Connection con = sql2o.open()) {
             return con.createQuery(sql)
                     .addParameter("emergenciaId", emergenciaId)
@@ -58,3 +58,4 @@ public class EmergenciaRepository {
         }
     }
 }
+

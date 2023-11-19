@@ -26,7 +26,7 @@ export default {
     }},
     created() {
         this.tareaid = this.$route.params.tareaId;
-
+        // Realiza una solicitud a la API para obtener todos los voluntarios
         axios.get('http://localhost:8080/voluntarios')
             .then(response => {
                 this.voluntarios = response.data;
