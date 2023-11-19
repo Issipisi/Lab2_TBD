@@ -1,0 +1,103 @@
+CREATE EXTENSION postgis;
+
+CREATE TABLE Institucion (
+    id BIGSERIAL PRIMARY KEY,
+    nombre VARCHAR(255),
+    geom GEOMETRY(Point, 4326)  -- Columna geoespacial para ubicación
+);
+
+-- Crear índice espacial para mejorar el rendimiento en consultas geoespaciales
+CREATE INDEX idx_institucion_geom ON Institucion USING GIST (geom);
+
+-- Tabla Habilidad
+CREATE TABLE Habilidad (
+    id BIGSERIAL PRIMARY KEY,
+    nombre VARCHAR(255)
+);
+
+CREATE TABLE Emergencia (
+    id BIGSERIAL PRIMARY KEY,
+    nombre VARCHAR(255),
+    descripcion TEXT,
+    geom GEOMETRY(Point, 4326),  -- Columna geoespacial para ubicación
+    institucionId BIGINT REFERENCES Institucion(id)  -- Clave foránea a Institucion
+);
+
+-- Crear índice espacial
+CREATE INDEX idx_emergencia_geom ON Emergencia USING GIST (geom);
+
+-- Tabla EmergenciaHabilidad
+CREATE TABLE EmergenciaHabilidad (
+    id BIGSERIAL PRIMARY KEY,
+    emergenciaId BIGINT REFERENCES Emergencia(id) NULL,
+    habilidadId BIGINT REFERENCES Habilidad(id) NULL
+);
+
+-- Tabla EstadoTarea
+CREATE TABLE EstadoTarea (
+    id BIGSERIAL PRIMARY KEY,
+    estado VARCHAR(255)
+);
+
+-- Tabla Tarea
+CREATE TABLE Tarea (
+    id BIGSERIAL PRIMARY KEY,
+    nombre VARCHAR(255),
+    descripcion TEXT,
+    emergenciaId BIGINT REFERENCES Emergencia(id) NULL,
+    estadoTareaId BIGINT REFERENCES EstadoTarea(id) NULL
+);
+
+-- Tabla TareaHabilidad
+CREATE TABLE TareaHabilidad (
+    id BIGSERIAL PRIMARY KEY,
+    tareaId BIGINT REFERENCES Tarea(id) NULL,
+    habilidadId BIGINT REFERENCES Habilidad(id) NULL
+);
+
+
+CREATE TABLE Voluntario (
+    id BIGSERIAL PRIMARY KEY,
+    nombre VARCHAR(255),
+    apellido VARCHAR(255),
+    geom GEOMETRY(Point, 4326),  -- Columna geoespacial para ubicación
+    correo VARCHAR(255),
+    contrasena VARCHAR(255),
+    idtarea BIGINT  -- Clave foránea a Tarea (si es necesario)
+);
+
+-- Crear índice espacial
+CREATE INDEX idx_voluntario_geom ON Voluntario USING GIST (geom);
+
+-- Tabla Ranking
+CREATE TABLE Ranking (
+    id BIGSERIAL PRIMARY KEY,
+    voluntarioId BIGINT REFERENCES Voluntario(id) NULL,
+    puntuacion INT
+);
+
+-- Tabla VolHabilidad
+CREATE TABLE VolHabilidad (
+    id BIGSERIAL PRIMARY KEY,
+    voluntarioId BIGINT REFERENCES Voluntario(id) NULL,
+    habilidadId BIGINT REFERENCES Habilidad(id) NULL
+);
+
+CREATE TABLE auditorio (
+    id SERIAL PRIMARY KEY,
+    user_id INT,
+    operation_type TEXT,
+    query_text TEXT,
+    execution_time TIMESTAMP
+);
+
+CREATE TABLE audit_log (
+                           id SERIAL PRIMARY KEY,
+                           user_id INT,
+                           operation_type TEXT,
+                           query_text TEXT,
+                           execution_time TIMESTAMP
+);
+
+
+ALTER TABLE tarea ADD FOREIGN KEY (estado_tarea_id) REFERENCES estado_tarea(id);
