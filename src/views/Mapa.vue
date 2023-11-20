@@ -20,7 +20,7 @@ export default {
     return {
       lat: 40.7127837,
       lon: -74.0059413,
-      apiKey: 'AIzaSyDz21ohvFYFXpn2FH0FNB3L78HZzJy9Ag8',
+      apiKey: '$API_KEY',
       emergencias: [],
       selectedEmergencia: null,
       voluntarios: [] // Almacena la información de los voluntarios obtenidos del back-end
