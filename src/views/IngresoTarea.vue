@@ -35,7 +35,77 @@
 
 <script>
 export default {
-  // ... (sin cambios en la sección data y methods)
+  data() {
+    return {
+      nombreselecionado: '', // Será el nombre de la tarea ingresado por el usuario
+      descripcion: '',
+      emergenciaSeleccionada: null,
+      emergencias: [],
+      tareaCreada: null,
+      tareaCreadaMensaje: false,
+      estadoTareaId: '1', // Inicializar con "Pendiente"
+    };
+  },
+  async created() {
+    try {
+      const response = await fetch("http://localhost:8080/emergencias", { mode: 'cors' });
+      if (response.ok) {
+        this.emergencias = await response.json();
+      } else {
+        console.error("Error al obtener las emergencias:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error al obtener las emergencias:", error);
+    }
+  },
+  methods: {
+    async crearTarea() {
+      try {
+        const tarea = {
+          nombre: this.nombreselecionado,
+          descripcion: this.descripcion,
+          emergenciaId: this.emergenciaSeleccionada,
+          estadoTareaId: this.estadoTareaId, // Usar el valor seleccionado
+        };
+
+        const response = await fetch("http://localhost:8080/tareas", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(tarea),
+        });
+
+        if (response.ok) {
+          const text = await response.text();
+          this.tareaCreadaMensaje = true;
+          this.nombreselecionado = '';
+          this.descripcion = '';
+          this.emergenciaSeleccionada = null;
+          this.estadoTareaId = '1';
+          setTimeout(() => {
+            this.tareaCreadaMensaje = false;
+          }, 7000);
+
+          if (text) {
+            try {
+              this.tareaCreada = JSON.parse(text);
+
+            } catch (parseError) {
+              console.error("Error al parsear la respuesta:", parseError);
+            }
+          } else {
+            this.tareaCreada = tarea;
+          }
+
+        } else {
+          console.error("Error al crear tarea:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error al crear tarea:", error);
+      }
+    }
+  }
 }
 </script>
 

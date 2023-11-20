@@ -12,8 +12,16 @@
           <textarea v-model="descripcion" id="descripcion" class="form-control" placeholder="Describa la emergencia"></textarea>
         </div>
         <div class="form-group">
-          <label class="form-label">Seleccione la ubicación:</label>
-          <map-component @location-selected="updateLocation"></map-component>
+          <label for="direccion" class="form-label">Dirección:</label>
+          <input v-model="direccion" id="direccion" class="form-control" placeholder="Ingrese la dirección completa" type="text" />
+        </div>
+        <div class="form-group">
+          <label for="institucion">Institución:</label>
+          <select v-model="institucionSeleccionada" id="institucion" required>
+            <option v-for="institucion in instituciones" :key="institucion.id" :value="institucion.id">
+              {{ institucion.nombre }}
+            </option>
+          </select>
         </div>
         <div class="form-group">
           <button class="btn btn-report">Reportar Emergencia</button>
@@ -24,31 +32,59 @@
 </template>
 
 <script>
-import MapComponent from './MapComponent.vue';
-
 export default {
-  components: {
-    MapComponent,
-  },
   data() {
     return {
       nombre: '',
       descripcion: '',
-      ubicacion: null,
+      direccion: '',
+      institucionSeleccionada: null,
+      instituciones: [],
     };
   },
+  async created() {
+    try {
+      const response = await fetch("http://localhost:8080/instituciones", { mode: 'cors' });
+      if (response.ok) {
+        this.instituciones = await response.json();
+      } else {
+        console.error("Error al obtener las instituciones:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error al obtener las instituciones:", error);
+    }
+  },
   methods: {
-    updateLocation(location) {
-      this.ubicacion = {
-        type: 'Point',
-        coordinates: [location.lng, location.lat],
-      };
+    async geocodificarDireccion() {
+      const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(this.direccion)}`;
+
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Respuesta de red no fue ok.');
+
+        const data = await response.json();
+        if (data.length === 0) throw new Error('No se encontraron resultados.');
+
+        const { lat, lon } = data[0];
+        return `POINT(${lon} ${lat})`;
+      } catch (error) {
+        console.error('Error al geocodificar la dirección:', error);
+        return null;
+      }
     },
+
     async reportarEmergencia() {
+      const ubicacion = await this.geocodificarDireccion();
+      if (!ubicacion) {
+        alert('No se pudo geocodificar la dirección ingresada.');
+        return;
+      }
+
       const requestData = {
         nombre: this.nombre,
         descripcion: this.descripcion,
-        ubicacion: this.ubicacion,
+        ubicacion,
+        institucionId: this.institucionSeleccionada,
       };
 
       try {
@@ -62,60 +98,64 @@ export default {
 
         if (response.ok) {
           console.log('Emergencia reportada con éxito');
-
+          // Lógica para después de enviar el formulario
         } else {
-          console.error('Error al reportar emergencia');
+          console.error('Error al reportar emergencia:', response.statusText);
         }
       } catch (error) {
-        console.error('Error al comunicarse con el servidor', error);
+        console.error('Error al comunicarse con el servidor:', error);
       }
     },
   },
 };
 </script>
-
 <style scoped>
 .emergency-container {
   display: flex;
+  flex-direction: column; /* Cambiado para alinear verticalmente */
   justify-content: center;
-  align-items: center;
-  height: 100vh;
+  align-items: center; /* Asegura que todo esté centrado horizontalmente */
+  min-height: 100vh;
+  padding: 2rem; /* Añade un poco de padding */
   background-color: #f8f9fa;
 }
 
 .form-container {
-  max-width: 400px;
+  width: 100%;
+  max-width: 600px;
   margin: auto;
-  padding: 20px;
-  background-color: rgba(255, 255, 255, 0.8);
+  padding: 2rem;
+  background-color: white;
   border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 1rem;
 }
 
 .form-group label {
-  display: block;
+  margin-bottom: 0.5rem;
+  color: #333;
+  font-weight: bold;
 }
 
 .form-group input,
 .form-group textarea {
-  width: 100%;
+  width: calc(100% - 20px);
   padding: 10px;
-  margin: 5px 0;
-  display: inline-block;
+  margin-bottom: 1rem;
+  display: block; /* Hace que los inputs utilicen todo el ancho */
   border: 1px solid #ccc;
   border-radius: 4px;
   box-sizing: border-box;
 }
 
 .btn-report {
+  width: 100%; /* Hace que el botón ocupe todo el ancho del contenedor */
   background-color: #dc3545;
   color: white;
   padding: 14px 20px;
-  margin: 8px 0;
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -127,7 +167,18 @@ export default {
 }
 
 h1 {
-  text-align: center;
+  margin-bottom: 2rem;
   color: #333;
+}
+
+
+@media (max-width: 768px) {
+  .emergency-container {
+    padding: 1rem;
+  }
+
+  .form-container {
+    padding: 1rem;
+  }
 }
 </style>

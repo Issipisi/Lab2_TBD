@@ -42,7 +42,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .cors().and()
                 .authorizeRequests()
-                .antMatchers("/voluntarios/signup", "/auditorio/auditorios", "/auditorio/reporte-usuarios-queries", "/tareas", "/login","/emergencias","/tareas/{id}","/voluntarios").permitAll()
+                .antMatchers("/voluntarios/signup", "/auditorio/auditorios", "/auditorio/reporte-usuarios-queries", "/tareas", "/login","/emergencias","/tareas/{id}","/voluntarios","/instituciones").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()

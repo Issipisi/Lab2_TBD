@@ -15,14 +15,14 @@ public class VoluntarioRepository {
     private Sql2o sql2o;
 
     public List<Voluntario> findAll() {
-        final String sql = "SELECT id, nombre, apellido, ST_AsText(geom) as ubicacion, correo, contrasena, idtarea FROM voluntario";
+        final String sql = "SELECT id, nombre, apellido, ST_AsText(ubicacion) as ubicacion, correo, contrasena, idtarea FROM voluntario";
         try (Connection con = sql2o.open()) {
             return con.createQuery(sql).executeAndFetch(Voluntario.class);
         }
     }
 
     public Voluntario findById(Long id) {
-        final String sql = "SELECT id, nombre, apellido, ST_AsText(geom) as ubicacion, correo, contrasena, idtarea FROM voluntario WHERE id = :id";
+        final String sql = "SELECT id, nombre, apellido, ST_AsText(ubicacion) as ubicacion, correo, contrasena, idtarea FROM voluntario WHERE id = :id";
         try (Connection con = sql2o.open()) {
             return con.createQuery(sql)
                     .addParameter("id", id)
@@ -31,7 +31,7 @@ public class VoluntarioRepository {
     }
 
     public void save(Voluntario voluntario) {
-        final String sql = "INSERT INTO voluntario (nombre, apellido, geom, correo, contrasena, idtarea) VALUES (:nombre, :apellido, ST_GeomFromText(:ubicacion, 4326), :correo, :contrasena, :idtarea)";
+        final String sql = "INSERT INTO voluntario (nombre, apellido, ubicacion, correo, contrasena, idtarea) VALUES (:nombre, :apellido, ST_GeomFromText(:ubicacion, 4326), :correo, :contrasena, :idtarea)";
         try (Connection con = sql2o.open()) {
             con.createQuery(sql, true)
                     .bind(voluntario)
@@ -41,7 +41,7 @@ public class VoluntarioRepository {
     }
 
     public void update(Voluntario voluntario) {
-        final String sql = "UPDATE voluntario SET nombre = :nombre, apellido = :apellido, geom = ST_GeomFromText(:ubicacion, 4326), correo = :correo, contrasena = :contrasena, idtarea = :idtarea WHERE id = :id";
+        final String sql = "UPDATE voluntario SET nombre = :nombre, apellido = :apellido, ubicacion = ST_GeomFromText(:ubicacion, 4326), correo = :correo, contrasena = :contrasena, idtarea = :idtarea WHERE id = :id";
         try (Connection con = sql2o.open()) {
             con.createQuery(sql)
                     .bind(voluntario)

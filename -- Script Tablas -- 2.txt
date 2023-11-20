@@ -3,11 +3,11 @@ CREATE EXTENSION postgis;
 CREATE TABLE Institucion (
     id BIGSERIAL PRIMARY KEY,
     nombre VARCHAR(255),
-    geom GEOMETRY(Point, 4326)  -- Columna geoespacial para ubicación
+    ubicacion GEOMETRY(Point, 4326)  -- Columna geoespacial para ubicación
 );
 
 -- Crear índice espacial para mejorar el rendimiento en consultas geoespaciales
-CREATE INDEX idx_institucion_geom ON Institucion USING GIST (geom);
+CREATE INDEX idx_institucion_ubicacion ON Institucion USING GIST (ubicacion);
 
 -- Tabla Habilidad
 CREATE TABLE Habilidad (
@@ -19,12 +19,12 @@ CREATE TABLE Emergencia (
     id BIGSERIAL PRIMARY KEY,
     nombre VARCHAR(255),
     descripcion TEXT,
-    geom GEOMETRY(Point, 4326),  -- Columna geoespacial para ubicación
+    ubicacion GEOMETRY(Point, 4326),  -- Columna geoespacial para ubicación
     institucionId BIGINT REFERENCES Institucion(id)  -- Clave foránea a Institucion
 );
 
 -- Crear índice espacial
-CREATE INDEX idx_emergencia_geom ON Emergencia USING GIST (geom);
+CREATE INDEX idx_emergencia_ubicacion ON Emergencia USING GIST (ubicacion);
 
 -- Tabla EmergenciaHabilidad
 CREATE TABLE EmergenciaHabilidad (
@@ -60,14 +60,14 @@ CREATE TABLE Voluntario (
     id BIGSERIAL PRIMARY KEY,
     nombre VARCHAR(255),
     apellido VARCHAR(255),
-    geom GEOMETRY(Point, 4326),  -- Columna geoespacial para ubicación
+    ubicacion GEOMETRY(Point, 4326),  -- Columna geoespacial para ubicación
     correo VARCHAR(255),
     contrasena VARCHAR(255),
     idtarea BIGINT  -- Clave foránea a Tarea (si es necesario)
 );
 
 -- Crear índice espacial
-CREATE INDEX idx_voluntario_geom ON Voluntario USING GIST (geom);
+CREATE INDEX idx_voluntario_ubicacion ON Voluntario USING GIST (ubicacion);
 
 -- Tabla Ranking
 CREATE TABLE Ranking (
@@ -100,4 +100,21 @@ CREATE TABLE audit_log (
 );
 
 
-ALTER TABLE tarea ADD FOREIGN KEY (estado_tarea_id) REFERENCES estado_tarea(id);
+ALTER TABLE Tarea ADD FOREIGN KEY (estadoTareaId) REFERENCES EstadoTarea(id);
+
+-- Insertar datos en la tabla Institucion
+INSERT INTO Institucion (nombre, ubicacion) VALUES
+    ('Institucion 1', ST_SetSRID(ST_Point(-73.95, 40.78), 4326)),
+    ('Institucion 2', ST_SetSRID(ST_Point(-74.01, 40.71), 4326)),
+    ('Institucion 3', ST_SetSRID(ST_Point(-73.94, 40.82), 4326)),
+    ('Institucion 4', ST_SetSRID(ST_Point(-73.99, 40.75), 4326)),
+    ('Institucion 5', ST_SetSRID(ST_Point(-73.97, 40.79), 4326));
+
+-- Insertar datos en la tabla Emergencia
+INSERT INTO Emergencia (nombre, descripcion, ubicacion, institucionId) VALUES
+    ('Emergencia 1', 'Descripción de Emergencia 1', ST_SetSRID(ST_Point(-73.96, 40.77), 4326), 1),
+    ('Emergencia 2', 'Descripción de Emergencia 2', ST_SetSRID(ST_Point(-74.02, 40.72), 4326), 2),
+    ('Emergencia 3', 'Descripción de Emergencia 3', ST_SetSRID(ST_Point(-73.93, 40.83), 4326), 3),
+    ('Emergencia 4', 'Descripción de Emergencia 4', ST_SetSRID(ST_Point(-73.98, 40.76), 4326), 4),
+    ('Emergencia 5', 'Descripción de Emergencia 5', ST_SetSRID(ST_Point(-73.96, 40.80), 4326), 5);
+

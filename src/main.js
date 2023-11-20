@@ -10,6 +10,7 @@ import register from './views/register.vue';
 import EmergenciasColumn from './views/EmergenciasColumn.vue';
 import TareasColumn from './views/TareasColumn.vue';
 import VoluntariosColumn from './views/VoluntariosColumn.vue';
+import CrearEmergencia from "@/views/CrearEmergencia.vue";
 
 
 const routes = [
@@ -47,7 +48,11 @@ const routes = [
         path: '/tareas/:tareaId',
         name: 'VoluntariosColumn',
         component: VoluntariosColumn
-    }
+    },
+    {
+        path: '/crear-emergencia',
+        component: CrearEmergencia,
+    },
 
 
 ]

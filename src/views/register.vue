@@ -1,52 +1,43 @@
 <template>
   <div class="register-container">
-    <h1 class="mt-4">Registro</h1>
     <div class="form-container">
+      <h1>Registro de Voluntarios</h1>
       <form @submit.prevent="enviarRegistro">
-        <!-- Campos de entrada -->
         <div class="form-group">
-          <label for="nombres" class="form-label">Nombres:</label>
-          <input v-model="nombres" id="nombres" class="form-control" placeholder="Juan" type="text" />
+          <label for="nombres">Nombres</label>
+          <input type="text" id="nombres" v-model="nombres" required>
         </div>
         <div class="form-group">
-          <label for="apellidos" class="form-label">Apellidos:</label>
-          <input v-model="apellidos" id="apellidos" class="form-control" placeholder="Perez" type="text" />
+          <label for="apellidos">Apellidos</label>
+          <input type="text" id="apellidos" v-model="apellidos" required>
         </div>
         <div class="form-group">
-          <label for="correo" class="form-label">Correo:</label>
-          <input v-model="correo" id="correo" class="form-control" placeholder="ejemplo@dominio.com" type="email" />
+          <label for="correo">Correo Electrónico</label>
+          <input type="email" id="correo" v-model="correo" required>
         </div>
         <div class="form-group">
-          <label for="contrasena" class="form-label">Contraseña:</label>
-          <input v-model="contrasena" id="contrasena" class="form-control" placeholder="password" type="password" />
+          <label for="contrasena">Contraseña</label>
+          <input type="password" id="contrasena" v-model="contrasena" required>
         </div>
         <div class="form-group">
-          <label for="password2" class="form-label">Repita su contraseña:</label>
-          <input v-model="contrasena2" id="password2" class="form-control" placeholder="password" type="password" />
-        </div>
-
-        <!-- Componente de Mapa para Ubicación -->
-        <div class="form-group">
-          <label class="form-label">Seleccione su ubicación:</label>
-          <map-component @location-selected="updateLocation"></map-component>
+          <label for="contrasena2">Repetir Contraseña</label>
+          <input type="password" id="contrasena2" v-model="contrasena2" required>
         </div>
 
-        <!-- Botón de envío -->
+        <!-- Nueva entrada para la dirección -->
         <div class="form-group">
-          <button class="btn btn-register">Registrarse</button>
+          <label for="direccion">Dirección:</label>
+          <input v-model="direccion" id="direccion" class="form-control" placeholder="Ingrese la dirección completa" type="text" required>
         </div>
+
+        <button type="submit" class="btn btn-register">Registrarse</button>
       </form>
     </div>
   </div>
 </template>
 
 <script>
-import MapComponent from './MapComponent.vue';
-
 export default {
-  components: {
-    MapComponent,
-  },
   data() {
     return {
       nombres: '',
@@ -54,43 +45,62 @@ export default {
       correo: '',
       contrasena: '',
       contrasena2: '',
-      ubicacion: null,
+      direccion: '',
     };
   },
   methods: {
-    updateLocation(location) {
-      this.ubicacion = {
-        type: 'Point',
-        coordinates: [location.lng, location.lat],
-      };
+
+    async geocodificarDireccion() {
+      const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(this.direccion)}`;
+
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Respuesta de red no fue ok.');
+
+        const data = await response.json();
+        if (data.length === 0) throw new Error('No se encontraron resultados.');
+
+
+        const { lat, lon } = data[0];
+        return `POINT(${lon} ${lat})`;
+      } catch (error) {
+        console.error('Error al geocodificar la dirección:', error);
+        return null;
+      }
     },
     async enviarRegistro() {
-      if (this.contrasena !== this.contrasena2) {
-        alert("Las contraseñas no coinciden");
+      const ubicacion = await this.geocodificarDireccion();
+      if (!ubicacion) {
+        alert('No se pudo geocodificar la dirección ingresada.');
         return;
       }
+
       const requestData = {
         nombre: this.nombres,
         apellido: this.apellidos,
         correo: this.correo,
         contrasena: this.contrasena,
-        ubicacion: this.ubicacion,
+        ubicacion, // Agrega la ubicación al objeto de solicitud
       };
+
       try {
-        console.log("Enviando Registro", requestData);
         const response = await fetch('http://localhost:8080/voluntarios/signup', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+          },
           body: JSON.stringify(requestData),
         });
+
         if (response.ok) {
-          console.log('Registro enviado con éxito');
+          console.log('Registro Enviado con éxito');
+          // Lógica para después de enviar el formulario
           this.$router.push('/login');
         } else {
-          console.error('Error al registrar');
+          console.error('Error al registrar:', response.statusText);
         }
       } catch (error) {
-        console.error('Error registrando el usuario', error);
+        console.error('Error al comunicarse con el servidor:', error);
       }
     },
   },
@@ -153,4 +163,3 @@ h1 {
   color: #333;
 }
 </style>
-

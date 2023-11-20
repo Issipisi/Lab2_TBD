@@ -40,14 +40,55 @@
 export default {
   data() {
     return {
-      tarea: null,
+      tarea: null, // Aquí almacenamos la tarea
       emergencias: [],
       tareaId: '',
       tareaActualizada: false,
     };
   },
   methods: {
-    // ... (sin cambios en los métodos)
+    async verTarea() {
+      try {
+        const id = parseInt(this.tareaId);
+        const tareaResponse = await fetch(`http://localhost:8080/tareas/${id}`);
+        const emergenciasResponse = await fetch("http://localhost:8080/emergencias");
+
+        if (tareaResponse.ok && emergenciasResponse.ok) {
+          this.tarea = await tareaResponse.json();
+          this.emergencias = await emergenciasResponse.json();
+
+        } else {
+          console.error("Error al obtener la tarea o las emergencias:", tareaResponse.statusText, emergenciasResponse.statusText);
+        }
+      } catch (error) {
+        console.error("Error al obtener la tarea o las emergencias:", error);
+      }
+    }
+    ,
+    async actualizarTarea() {
+      try {
+        const response = await fetch(`http://localhost:8080/tareas/${this.tarea.id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(this.tarea),
+        });
+
+        if (response.ok) {
+          this.tareaActualizada = true;
+          setTimeout(() => {
+            this.tareaActualizada = false;
+          }, 7000);
+          console.log("Tarea actualizada correctamente");
+        } else {
+          console.error("Error al actualizar tarea:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error al actualizar tarea:", error);
+      }
+      this.tarea = null;
+    },
   },
 };
 </script>

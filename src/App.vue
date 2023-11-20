@@ -6,7 +6,9 @@
       <router-link class="nav-btn" :to="'/actualizar-tarea/' + id">Actualizar Tarea</router-link>
       <router-link class="nav-btn" to="/login">Iniciar Sesión</router-link>
       <router-link class="nav-btn" to="/register">Registrarse</router-link>
+      <router-link class="nav-btn" to="/crear-emergencia">Crear Emergencia</router-link>
       <router-link class="nav-btn" to="/emergencias">Emergencias</router-link>
+
     </nav>
     <router-view />
   </div>
