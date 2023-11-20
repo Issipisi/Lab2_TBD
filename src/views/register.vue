@@ -1,48 +1,30 @@
 <template>
-  <div class="container">
-    <h1 class="mt-4" style="text-align: center">Registro</h1>
-    <div class="row">
-      <div class="col">
-        <form @submit.prevent="enviarRegistro">
-          <div class="row">
-            <div class="col-md-5">
-              <!-- Campos de entrada -->
-
-              <!-- Nombres -->
-              <div class="mb-2">
-                <label for="nombres" class="form-label">Nombres:</label>
-                <input v-model="nombres" id="nombres" class="form-control" placeholder="Juan" type="text" />
-              </div>
-              <!-- Apellidos -->
-              <div class="mb-2">
-                <label for="apellidos" class="form-label">Apellidos:</label>
-                <input v-model="apellidos" id="apellidos" class="form-control" placeholder="Perez" type="text" />
-              </div>
-              <!-- Correo -->
-              <div class="mb-2">
-                <label for="correo" class="form-label">Correo:</label>
-                <input v-model="correo" id="correo" class="form-control" placeholder="ejemplo@dominio.com" type="email" />
-              </div>
-              <!-- Contraseña -->
-              <div class="mb-2">
-                <label for="contrasena" class="form-label">Contraseña:</label>
-                <input v-model="contrasena" id="contrasena" class="form-control" placeholder="password" type="password" />
-              </div>
-              <!-- Repetir Contraseña -->
-              <div class="mb-2">
-                <label for="password2" class="form-label">Repita su contraseña:</label>
-                <input v-model="contrasena2" id="password2" class="form-control" placeholder="password" type="password" />
-              </div>
-            </div>
-            <div class="col-md-2"></div>
-            <div class="row mt-4">
-              <div class="col text-center">
-                <button id="enviarRegister" class="btn btn-primary">Registrarse</button>
-              </div>
-            </div>
-          </div>
-        </form>
-      </div>
+  <div class="register-container">
+    <div class="form-container">
+      <h1>Registro de Voluntarios</h1>
+      <form @submit.prevent="enviarRegistro">
+        <div class="form-group">
+          <label for="nombres">Nombres</label>
+          <input type="text" id="nombres" v-model="nombres" required>
+        </div>
+        <div class="form-group">
+          <label for="apellidos">Apellidos</label>
+          <input type="text" id="apellidos" v-model="apellidos" required>
+        </div>
+        <div class="form-group">
+          <label for="correo">Correo Electrónico</label>
+          <input type="email" id="correo" v-model="correo" required>
+        </div>
+        <div class="form-group">
+          <label for="contrasena">Contraseña</label>
+          <input type="password" id="contrasena" v-model="contrasena" required>
+        </div>
+        <div class="form-group">
+          <label for="contrasena2">Repetir Contraseña</label>
+          <input type="password" id="contrasena2" v-model="contrasena2" required>
+        </div>
+        <button type="submit" class="btn btn-register">Registrarse</button>
+      </form>
     </div>
   </div>
 </template>
@@ -70,31 +52,65 @@ export default {
         correo: this.correo,
         contrasena: this.contrasena,
       };
-      try {
-        console.log("Enciando Registros", requestData);
-        const response = await fetch('http://localhost:8080/voluntarios/signup', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(requestData)
-        });
-        if (response.ok){
-          console.log('Registro Enviado con exito');
-
-          // Aquí rediriges al usuario después de un registro exitoso
-          this.$router.push('/login');
-        } else {
-          console.error('Error al registrar')
-        }
-      }catch (error){
-        console.error('Error registrando el usuario', error);
-      }
+      // Lógica para enviar los datos al servidor...
     }
   }
-}
+};
 </script>
 
 <style scoped>
+.register-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: url('../assets/imagen4.jpg') center/cover no-repeat;
+}
 
+.form-container {
+  max-width: 400px;
+  margin: auto;
+  padding: 20px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.btn-register {
+  background-color: #3498db;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-register:hover {
+  background-color: #2980b9;
+}
+
+h1 {
+  text-align: center;
+  color: #333;
+}
 </style>
