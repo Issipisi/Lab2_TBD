@@ -1,10 +1,10 @@
 <template>
-  <div style="min-height: 100vh; display: flex; justify-content: center; align-items: center;">
-    <div style="background-color: #fff; padding: 1rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); width: 20rem;">
-      <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem;">Tareas</h2>
-      <ul style="list-style: none; padding: 0;">
-        <li v-for="tarea in tareasFiltradas" :key="tarea.id" style="margin-bottom: 0.5rem;">
-          <router-link :to="'/tareas/' + tarea.id" style="color: #007BFF; text-decoration: none;">
+  <div class="page-container">
+    <div class="form-container">
+      <h2>Tareas</h2>
+      <ul class="tareas-list">
+        <li v-for="tarea in tareasFiltradas" :key="tarea.id">
+          <router-link :to="'/tareas/' + tarea.id" class="tarea-link">
             {{ tarea.nombre }}
           </router-link>
         </li>
@@ -12,7 +12,6 @@
     </div>
   </div>
 </template>
-
 
 <script>
 import axios from "axios";
@@ -25,19 +24,60 @@ export default {
   },
   computed: {
     tareasFiltradas() {
-      return this.tareas.filter(tarea => parseInt(tarea.emergenciaId) === parseInt(this.emergenciaid));
-    }
+      // Aquí debes implementar la lógica para filtrar las tareas según tus necesidades
+      // En este ejemplo, simplemente se devuelve la lista completa de tareas.
+      return this.tareas;
+    },
   },
   created() {
-    this.emergenciaid = this.$route.params.emergenciaId;
     // Realiza una solicitud a la API para obtener todas las tareas
-    axios.get('http://localhost:8080/tareas')
-        .then(response => {
+    axios
+        .get("http://localhost:8080/tareas")
+        .then((response) => {
           this.tareas = response.data;
         })
-        .catch(error => {
-          console.error('Error al obtener las tareas:', error);
+        .catch((error) => {
+          console.error("Error al obtener las tareas:", error);
         });
-  }
+  },
 };
 </script>
+
+<style scoped>
+.page-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: url('@/assets/imagen5.jpg') center/cover no-repeat;
+}
+
+.form-container {
+  max-width: 400px;
+  padding: 20px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+h2 {
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.tareas-list {
+  list-style: none;
+  padding: 0;
+}
+
+.tareas-list li {
+  margin-bottom: 0.5rem;
+}
+
+.tarea-link {
+  color: #007BFF;
+  text-decoration: none;
+}
+</style>
