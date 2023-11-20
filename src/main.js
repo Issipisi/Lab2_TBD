@@ -10,6 +10,7 @@ import register from './views/register.vue';
 import EmergenciasColumn from './views/EmergenciasColumn.vue';
 import TareasColumn from './views/TareasColumn.vue';
 import VoluntariosColumn from './views/VoluntariosColumn.vue';
+import Mapa from './views/Mapa.vue';
 import CrearEmergencia from "@/views/CrearEmergencia.vue";
 
 
@@ -29,6 +30,9 @@ const routes = [
     {
         path: '/crearTarea',
         component: CrearTarea,
+    },
+    {        path: '/mapa',
+        component: Mapa,
     },
     {
         path: '/actualizar-tarea/:id',

@@ -8,7 +8,7 @@
       <router-link class="nav-btn" to="/register">Registrarse</router-link>
       <router-link class="nav-btn" to="/crear-emergencia">Crear Emergencia</router-link>
       <router-link class="nav-btn" to="/emergencias">Emergencias</router-link>
-
+      <router-link class="nav-btn" to="/mapa">Mapa</router-link>
     </nav>
     <router-view />
   </div>
