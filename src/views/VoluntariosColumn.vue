@@ -22,13 +22,10 @@ export default {
   },
   computed: {
     voluntariosFiltrados() {
-      // Aquí debes implementar la lógica para filtrar los voluntarios según tus necesidades
-      // En este ejemplo, simplemente se devuelve la lista completa de voluntarios.
       return this.voluntarios;
     },
   },
   created() {
-    // Realiza una solicitud a la API para obtener todos los voluntarios
     axios
         .get("http://localhost:8080/voluntarios")
         .then((response) => {
